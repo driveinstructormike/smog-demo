@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,541 +7,1056 @@
 <title>S.M.O.G. Driving Simulator</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
+/* =========================================================
+   BASIC SETUP
+========================================================= */
 
-    html,
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #20242a;
+    color: #ffffff;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    padding: 12px;
+}
+
+.simulator {
+    width: min(1100px, 100%);
+}
+
+
+/* =========================================================
+   SIMULATION
+========================================================= */
+
+.simulation {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    min-height: 500px;
+    overflow: hidden;
+    border: 3px solid #11161b;
+    border-radius: 12px;
+    background: #78b8df;
+}
+
+
+/* =========================================================
+   SKY
+========================================================= */
+
+.sky {
+    position: absolute;
+    inset: 0 0 47% 0;
+
+    background: linear-gradient(
+        to bottom,
+        #65afe0 0%,
+        #b6ddf1 100%
+    );
+}
+
+
+/* =========================================================
+   CLOUDS
+========================================================= */
+
+.cloud {
+    position: absolute;
+    width: 110px;
+    height: 32px;
+    background: rgba(255,255,255,.82);
+    border-radius: 30px;
+}
+
+.cloud::before,
+.cloud::after {
+    content: "";
+    position: absolute;
+    background: inherit;
+    border-radius: 50%;
+}
+
+.cloud::before {
+    width: 48px;
+    height: 48px;
+    left: 18px;
+    bottom: 8px;
+}
+
+.cloud::after {
+    width: 60px;
+    height: 60px;
+    right: 15px;
+    bottom: 4px;
+}
+
+.cloud1 {
+    top: 10%;
+    left: 8%;
+}
+
+.cloud2 {
+    top: 16%;
+    right: 12%;
+    transform: scale(.75);
+}
+
+
+/* =========================================================
+   GROUND
+========================================================= */
+
+.ground {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 55%;
+    background: #568d47;
+}
+
+
+/* =========================================================
+   ROAD
+========================================================= */
+
+.road {
+    position: absolute;
+
+    left: 7%;
+    right: 7%;
+    bottom: 0;
+
+    height: 62%;
+
+    background: #4c4f52;
+
+    clip-path: polygon(
+        27% 0,
+        73% 0,
+        100% 100%,
+        0 100%
+    );
+
+    transition: transform .8s ease;
+}
+
+
+/* =========================================================
+   ROAD LANE DIVIDERS
+========================================================= */
+
+/*
+   The road contains:
+
+   OPPOSING DIRECTION
+   Lane 1
+   Lane 2
+
+   CENTER TURN LANE
+
+   YOUR DIRECTION
+   Lane 1
+   Lane 2
+*/
+
+
+.road-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+}
+
+
+/* Center turn lane boundaries */
+
+.turn-lane-left,
+.turn-lane-right {
+    width: 3px;
+    background: #e5c84a;
+}
+
+.turn-lane-left {
+    left: 40%;
+}
+
+.turn-lane-right {
+    left: 60%;
+}
+
+
+/* White lane divider lines */
+
+.lane-left,
+.lane-right {
+    width: 3px;
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            #ffffff 0 24px,
+            transparent 24px 45px
+        );
+}
+
+.lane-left {
+    left: 20%;
+}
+
+.lane-right {
+    left: 80%;
+}
+
+
+/* =========================================================
+   ROAD DIRECTION ARROWS
+========================================================= */
+
+.road-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+}
+
+.road-arrow.up {
+    border-bottom: 28px solid rgba(255,255,255,.55);
+}
+
+.road-arrow.down {
+    border-top: 28px solid rgba(255,255,255,.55);
+}
+
+
+/* =========================================================
+   MIRRORS
+========================================================= */
+
+.mirror {
+    position: absolute;
+
+    top: 4%;
+
+    width: 17%;
+    height: 12%;
+
+    background: #101418;
+
+    border: 3px solid #343a40;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,.45);
+
+    overflow: hidden;
+
+    z-index: 30;
+
+    transition:
+        border-color .3s ease,
+        box-shadow .3s ease,
+        transform .3s ease;
+}
+
+
+.mirror.left {
+    left: 2%;
+}
+
+
+.mirror.right {
+    right: 2%;
+}
+
+
+.mirror.rear {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 23%;
+}
+
+
+.mirror-view {
+    position: absolute;
+
+    inset: 7px;
+
+    border-radius: 7px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #78b9dc 0 40%,
+            #669252 40% 65%,
+            #55585b 65% 100%
+        );
+}
+
+
+.mirror-label {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 3px;
+
+    text-align: center;
+
+    font-size: 10px;
+    font-weight: bold;
+
+    color: #ffffff;
+
+    text-shadow: 0 1px 2px #000;
+}
+
+
+/* Mirror highlighted */
+
+.mirror.highlight {
+    border-color: #ffd54a;
+
+    box-shadow:
+        0 0 0 4px rgba(255,213,74,.35),
+        0 0 25px rgba(255,213,74,.9);
+
+    transform: scale(1.06);
+}
+
+.mirror.rear.highlight {
+    transform:
+        translateX(-50%)
+        scale(1.06);
+}
+
+
+/* =========================================================
+   BLIND SPOT AREAS
+========================================================= */
+
+.blindspot {
+    position: absolute;
+
+    width: 18%;
+    height: 25%;
+
+    top: 42%;
+
+    background: rgba(255,193,7,.0);
+
+    border: 3px solid transparent;
+
+    border-radius: 50%;
+
+    z-index: 15;
+
+    pointer-events: none;
+
+    transition:
+        background .35s ease,
+        border-color .35s ease,
+        box-shadow .35s ease;
+}
+
+
+.blindspot.left {
+    left: 4%;
+}
+
+
+.blindspot.right {
+    right: 4%;
+}
+
+
+.blindspot.highlight {
+    background: rgba(255,193,7,.32);
+
+    border-color: #ffd54a;
+
+    box-shadow:
+        0 0 25px rgba(255,213,74,.9);
+}
+
+
+.blindspot-label {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    text-align: center;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    color: #ffffff;
+
+    text-shadow:
+        0 2px 3px #000;
+
+    opacity: 0;
+}
+
+
+.blindspot.highlight .blindspot-label {
+    opacity: 1;
+}
+
+
+/* =========================================================
+   CAR
+========================================================= */
+
+.car {
+    position: absolute;
+
+    left: 50%;
+
+    bottom: 6%;
+
+    width: 14%;
+    height: 25%;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 20;
+
+    transition:
+        left 1.5s ease,
+        bottom 1.5s ease,
+        transform 1.5s ease;
+}
+
+
+/* Car body */
+
+.car-body {
+    position: absolute;
+
+    left: 10%;
+    right: 10%;
+
+    top: 15%;
+    bottom: 0;
+
+    background: #c62828;
+
+    border: 4px solid #7e1717;
+
+    border-radius:
+        28px
+        28px
+        14px
+        14px;
+
+    box-shadow:
+        0 8px 14px rgba(0,0,0,.45);
+}
+
+
+/* Windows */
+
+.car-window {
+    position: absolute;
+
+    left: 23%;
+    right: 23%;
+
+    top: 7%;
+
+    height: 31%;
+
+    background: #253b4b;
+
+    border: 3px solid #111a20;
+
+    border-radius:
+        15px
+        15px
+        5px
+        5px;
+}
+
+
+/* Hood */
+
+.hood {
+    position: absolute;
+
+    left: 17%;
+    right: 17%;
+
+    top: 43%;
+
+    height: 26%;
+
+    background: #d73535;
+
+    border-radius: 10px;
+
+    border-top:
+        2px solid #ef6969;
+}
+
+
+/* Headlights */
+
+.headlight {
+    position: absolute;
+
+    width: 18%;
+    height: 10%;
+
+    top: 67%;
+
+    background: #f5f0c8;
+
+    border-radius: 5px;
+}
+
+.headlight.left {
+    left: 16%;
+}
+
+.headlight.right {
+    right: 16%;
+}
+
+
+/* Turn signal */
+
+.turn-signal {
+    position: absolute;
+
+    width: 11%;
+    height: 7%;
+
+    top: 70%;
+
+    border-radius: 50%;
+
+    background: #555;
+
+    transition:
+        background .2s ease,
+        box-shadow .2s ease;
+}
+
+.turn-signal.left {
+    left: 8%;
+}
+
+.turn-signal.right {
+    right: 8%;
+}
+
+.turn-signal.active {
+    background: #ffb300;
+
+    box-shadow:
+        0 0 15px #ffb300;
+}
+
+
+/* =========================================================
+   SHOULDER CHECK ANIMATION
+========================================================= */
+
+.car.shoulder-left {
+    transform:
+        translateX(-50%)
+        rotate(-8deg);
+}
+
+
+.car.shoulder-right {
+    transform:
+        translateX(-50%)
+        rotate(8deg);
+}
+
+
+/* =========================================================
+   STEP INDICATOR
+========================================================= */
+
+.smog-panel {
+    position: absolute;
+
+    left: 50%;
+    bottom: 2%;
+
+    transform: translateX(-50%);
+
+    width: min(700px, 92%);
+
+    padding: 10px 14px;
+
+    background: rgba(17,22,27,.94);
+
+    border:
+        2px solid #343a40;
+
+    border-radius: 10px;
+
+    z-index: 40;
+}
+
+
+.smog-title {
+    text-align: center;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 8px;
+}
+
+
+.smog-steps {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 7px;
+}
+
+
+.smog-step {
+    padding: 7px 5px;
+
+    text-align: center;
+
+    background: #252b31;
+
+    border:
+        2px solid #3a424a;
+
+    border-radius: 7px;
+
+    transition:
+        background .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+
+
+.step-letter {
+    display: inline-block;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    margin-right: 3px;
+}
+
+
+.step-name {
+    font-size: 10px;
+
+    color: #cbd1d6;
+}
+
+
+.step-status {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    color: #aeb6c0;
+}
+
+
+/* Current step */
+
+.smog-step.current {
+    border-color: #ffd54a;
+
+    background: #443b18;
+
+    box-shadow:
+        0 0 15px rgba(255,213,74,.45);
+}
+
+
+/* Completed step */
+
+.smog-step.complete {
+    border-color: #35c759;
+
+    background: #193521;
+}
+
+
+.smog-step.complete .step-status {
+    color: #57e879;
+}
+
+
+/* =========================================================
+   INSTRUCTION
+========================================================= */
+
+.instruction {
+    position: absolute;
+
+    left: 50%;
+    top: 19%;
+
+    transform:
+        translateX(-50%);
+
+    width: min(500px, 80%);
+
+    padding: 12px 18px;
+
+    background:
+        rgba(0,0,0,.72);
+
+    border-radius: 8px;
+
+    text-align: center;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    z-index: 50;
+
+    transition:
+        opacity .25s ease;
+}
+
+
+/* =========================================================
+   DIRECTION CONTROLS
+========================================================= */
+
+.direction-controls {
+    position: absolute;
+
+    left: 50%;
+    top: 37%;
+
+    transform:
+        translateX(-50%);
+
+    display: flex;
+
+    gap: 18px;
+
+    z-index: 60;
+
+    transition:
+        opacity .3s ease;
+}
+
+
+.direction-button {
+    min-width: 190px;
+
+    padding: 14px 20px;
+
+    border:
+        3px solid #20252a;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #111111;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 12px rgba(0,0,0,.4);
+
+    transition:
+        transform .15s ease,
+        background .15s ease;
+}
+
+
+.direction-button:hover:not(:disabled) {
+    background: #f2f2f2;
+
+    transform:
+        translateY(-2px);
+}
+
+
+.direction-button:disabled {
+    opacity: .35;
+
+    cursor: not-allowed;
+}
+
+
+.direction-button.hidden {
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   SUCCESS MESSAGE
+========================================================= */
+
+.success-message {
+    position: absolute;
+
+    left: 50%;
+    top: 28%;
+
+    transform:
+        translateX(-50%)
+        scale(.8);
+
+    padding: 14px 25px;
+
+    background:
+        rgba(22,105,48,.94);
+
+    border:
+        2px solid #65e58a;
+
+    border-radius: 10px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    z-index: 70;
+
+    transition:
+        opacity .3s ease,
+        transform .3s ease;
+}
+
+
+.success-message.show {
+    opacity: 1;
+
+    transform:
+        translateX(-50%)
+        scale(1);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 700px) {
+
     body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        min-height: 100%;
-        font-family: Arial, Helvetica, sans-serif;
-        background: #20242a;
-        color: #ffffff;
+        padding: 5px;
     }
-
-    body {
-        display: flex;
-        justify-content: center;
-        padding: 20px;
-    }
-
-    .simulator {
-        width: min(1100px, 100%);
-    }
-
-    /* --------------------------------------------------
-       HEADER
-    -------------------------------------------------- */
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-    }
-
-    .title {
-        font-size: clamp(22px, 4vw, 32px);
-        font-weight: bold;
-        letter-spacing: 1px;
-    }
-
-    .build {
-        font-size: 13px;
-        color: #aeb6c0;
-    }
-
-    /* --------------------------------------------------
-       SIMULATION AREA
-    -------------------------------------------------- */
 
     .simulation {
-        position: relative;
-        width: 100%;
-        aspect-ratio: 16 / 9;
         min-height: 400px;
-        overflow: hidden;
-        border: 3px solid #11161b;
-        border-radius: 12px;
-        background: #75b9e6;
     }
 
-    /* Sky */
+    .direction-controls {
+        width: 90%;
 
-    .sky {
-        position: absolute;
-        inset: 0 0 52% 0;
-        background: linear-gradient(
-            to bottom,
-            #63aee0 0%,
-            #a9d8f1 100%
-        );
-    }
-
-    /* Clouds */
-
-    .cloud {
-        position: absolute;
-        width: 110px;
-        height: 32px;
-        background: rgba(255,255,255,.8);
-        border-radius: 30px;
-    }
-
-    .cloud::before,
-    .cloud::after {
-        content: "";
-        position: absolute;
-        background: inherit;
-        border-radius: 50%;
-    }
-
-    .cloud::before {
-        width: 48px;
-        height: 48px;
-        left: 18px;
-        bottom: 8px;
-    }
-
-    .cloud::after {
-        width: 60px;
-        height: 60px;
-        right: 15px;
-        bottom: 4px;
-    }
-
-    .cloud1 {
-        top: 12%;
-        left: 8%;
-    }
-
-    .cloud2 {
-        top: 18%;
-        right: 12%;
-        transform: scale(.75);
-    }
-
-    /* Ground */
-
-    .ground {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 52%;
-        background: #4f8b42;
-    }
-
-    /* Road */
-
-    .road {
-        position: absolute;
-        left: 15%;
-        right: 15%;
-        bottom: 0;
-        height: 57%;
-        background: #4a4d50;
-        clip-path: polygon(
-            36% 0,
-            64% 0,
-            100% 100%,
-            0 100%
-        );
-    }
-
-    /* Road edge lines */
-
-    .road::before,
-    .road::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 5px;
-        background: #ffffff;
-    }
-
-    .road::before {
-        left: 35%;
-    }
-
-    .road::after {
-        right: 35%;
-    }
-
-    /* Center dashed line */
-
-    .center-line {
-        position: absolute;
-        left: 50%;
-        top: 0;
-        bottom: 0;
-        width: 6px;
-        transform: translateX(-50%);
-        background:
-            repeating-linear-gradient(
-                to bottom,
-                #f4d35e 0 30px,
-                transparent 30px 55px
-            );
-    }
-
-    /* --------------------------------------------------
-       MIRRORS
-    -------------------------------------------------- */
-
-    .mirror {
-        position: absolute;
-        top: 5%;
-        width: 18%;
-        height: 13%;
-        background: #101418;
-        border: 3px solid #343a40;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,.45);
-        overflow: hidden;
-        z-index: 10;
-    }
-
-    .mirror.left {
-        left: 3%;
-    }
-
-    .mirror.right {
-        right: 3%;
-    }
-
-    .mirror.rear {
-        left: 50%;
-        transform: translateX(-50%);
-        width: 25%;
-    }
-
-    .mirror-view {
-        position: absolute;
-        inset: 7px;
-        border-radius: 7px;
-        background:
-            linear-gradient(
-                to bottom,
-                #78b9dc 0 42%,
-                #679454 42% 65%,
-                #55585b 65% 100%
-            );
-    }
-
-    .mirror-label {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 3px;
-        text-align: center;
-        font-size: 10px;
-        font-weight: bold;
-        color: #ffffff;
-        text-shadow: 0 1px 2px #000;
-    }
-
-    /* --------------------------------------------------
-       CAR
-    -------------------------------------------------- */
-
-    .car {
-        position: absolute;
-        left: 50%;
-        bottom: 7%;
-        width: 17%;
-        height: 28%;
-        transform: translateX(-50%);
-        z-index: 8;
-    }
-
-    .car-body {
-        position: absolute;
-        left: 10%;
-        right: 10%;
-        top: 15%;
-        bottom: 0;
-        background: #c62828;
-        border: 4px solid #7e1717;
-        border-radius: 28px 28px 14px 14px;
-        box-shadow: 0 8px 14px rgba(0,0,0,.45);
-    }
-
-    .car-window {
-        position: absolute;
-        left: 23%;
-        right: 23%;
-        top: 7%;
-        height: 31%;
-        background: #253b4b;
-        border: 3px solid #111a20;
-        border-radius: 15px 15px 5px 5px;
-    }
-
-    .hood {
-        position: absolute;
-        left: 17%;
-        right: 17%;
-        top: 43%;
-        height: 26%;
-        background: #d73535;
-        border-radius: 10px;
-        border-top: 2px solid #ef6969;
-    }
-
-    .headlight {
-        position: absolute;
-        width: 18%;
-        height: 10%;
-        top: 67%;
-        background: #f5f0c8;
-        border-radius: 5px;
-    }
-
-    .headlight.left {
-        left: 16%;
-    }
-
-    .headlight.right {
-        right: 16%;
-    }
-
-    .turn-signal {
-        position: absolute;
-        width: 11%;
-        height: 7%;
-        top: 70%;
-        border-radius: 50%;
-        background: #555;
-    }
-
-    .turn-signal.left {
-        left: 8%;
-    }
-
-    .turn-signal.right {
-        right: 8%;
-    }
-
-    .turn-signal.active {
-        background: #ffb300;
-        box-shadow: 0 0 15px #ffb300;
-    }
-
-    /* --------------------------------------------------
-       CONTROL PANEL
-    -------------------------------------------------- */
-
-    .controls {
-        position: absolute;
-        left: 50%;
-        bottom: 2%;
-        transform: translateX(-50%);
-        display: flex;
         gap: 8px;
-        z-index: 20;
     }
 
-    button {
-        border: 2px solid #1b1f23;
-        border-radius: 7px;
-        background: #f2f2f2;
-        color: #151515;
-        padding: 8px 12px;
+    .direction-button {
+        min-width: 0;
+
+        width: 50%;
+
+        padding: 10px 5px;
+
+        font-size: 11px;
+    }
+
+    .instruction {
         font-size: 13px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 3px 6px rgba(0,0,0,.3);
-    }
 
-    button:hover {
-        background: #ffffff;
-    }
+        top: 20%;
 
-    button:active {
-        transform: translateY(1px);
+        width: 88%;
     }
-
-    button.active {
-        background: #ffb300;
-    }
-
-    /* --------------------------------------------------
-       SMOG PANEL
-    -------------------------------------------------- */
 
     .smog-panel {
-        margin-top: 14px;
-        padding: 18px;
-        background: #11161b;
-        border-radius: 10px;
-        border: 2px solid #343a40;
-    }
+        width: 94%;
 
-    .smog-title {
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
-        letter-spacing: 3px;
-        margin-bottom: 14px;
-    }
-
-    .smog-steps {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-    }
-
-    .smog-step {
-        padding: 12px 8px;
-        text-align: center;
-        background: #252b31;
-        border: 2px solid #3a424a;
-        border-radius: 8px;
+        padding: 7px;
     }
 
     .step-letter {
-        display: block;
-        font-size: 25px;
-        font-weight: bold;
-        margin-bottom: 4px;
-    }
-
-    .step-name {
-        font-size: 12px;
-        color: #cbd1d6;
-    }
-
-    .step-status {
-        display: block;
-        margin-top: 7px;
-        font-size: 13px;
-        font-weight: bold;
-        color: #aeb6c0;
-    }
-
-    .smog-step.complete {
-        border-color: #35c759;
-        background: #193521;
-    }
-
-    .smog-step.complete .step-status {
-        color: #57e879;
-    }
-
-    /* --------------------------------------------------
-       INSTRUCTION
-    -------------------------------------------------- */
-
-    .instruction {
-        margin-top: 12px;
-        padding: 14px;
-        text-align: center;
-        background: #e9ecef;
-        color: #151515;
-        border-radius: 8px;
         font-size: 15px;
-        font-weight: bold;
     }
 
-    /* --------------------------------------------------
-       RESPONSIVE
-    -------------------------------------------------- */
-
-    @media (max-width: 700px) {
-
-        body {
-            padding: 8px;
-        }
-
-        .simulation {
-            min-height: 300px;
-        }
-
-        .controls {
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 95%;
-        }
-
-        button {
-            padding: 6px 8px;
-            font-size: 11px;
-        }
-
-        .smog-panel {
-            padding: 10px;
-        }
-
-        .smog-steps {
-            gap: 5px;
-        }
-
-        .step-letter {
-            font-size: 20px;
-        }
-
-        .step-name {
-            font-size: 9px;
-        }
+    .step-name,
+    .step-status {
+        font-size: 8px;
     }
+
+    .mirror-label {
+        font-size: 7px;
+    }
+}
+
 </style>
 </head>
 
+
 <body>
+
 
 <div class="simulator">
 
-    <!-- HEADER -->
-    <div class="header">
-        <div class="title">S.M.O.G. Driving Simulator</div>
-        <div class="build">Build 1</div>
-    </div>
-
-
-    <!-- ==================================================
-         SIMULATION
-    ================================================== -->
-
     <div class="simulation">
+
+
+        <!-- =================================================
+             SKY
+        ================================================== -->
 
         <div class="sky"></div>
 
         <div class="cloud cloud1"></div>
         <div class="cloud cloud2"></div>
 
+
+        <!-- =================================================
+             GROUND
+        ================================================== -->
+
         <div class="ground"></div>
 
+
+        <!-- =================================================
+             ROAD
+        ================================================== -->
+
         <div class="road">
-            <div class="center-line"></div>
+
+            <!-- Lane dividers -->
+
+            <div class="road-line lane-left"></div>
+            <div class="road-line lane-right"></div>
+
+            <!-- Center turn lane -->
+
+            <div class="road-line turn-lane-left"></div>
+            <div class="road-line turn-lane-right"></div>
+
         </div>
 
 
-        <!-- MIRRORS -->
+        <!-- =================================================
+             MIRRORS
+        ================================================== -->
 
-        <div class="mirror left">
+        <div class="mirror left" id="leftMirror">
+
             <div class="mirror-view"></div>
-            <div class="mirror-label">LEFT MIRROR</div>
+
+            <div class="mirror-label">
+                LEFT MIRROR
+            </div>
+
         </div>
 
-        <div class="mirror rear">
+
+        <div class="mirror rear" id="rearMirror">
+
             <div class="mirror-view"></div>
-            <div class="mirror-label">REAR VIEW</div>
+
+            <div class="mirror-label">
+                REAR VIEW
+            </div>
+
         </div>
 
-        <div class="mirror right">
+
+        <div class="mirror right" id="rightMirror">
+
             <div class="mirror-view"></div>
-            <div class="mirror-label">RIGHT MIRROR</div>
+
+            <div class="mirror-label">
+                RIGHT MIRROR
+            </div>
+
         </div>
 
 
-        <!-- CAR -->
+        <!-- =================================================
+             BLIND SPOTS
+        ================================================== -->
 
-        <div class="car">
+        <div
+            class="blindspot left"
+            id="leftBlindspot">
+
+            <div class="blindspot-label">
+                CHECK LEFT
+            </div>
+
+        </div>
+
+
+        <div
+            class="blindspot right"
+            id="rightBlindspot">
+
+            <div class="blindspot-label">
+                CHECK RIGHT
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CAR
+        ================================================== -->
+
+        <div class="car" id="car">
 
             <div class="car-body"></div>
 
@@ -551,122 +1065,195 @@
             <div class="hood"></div>
 
             <div class="headlight left"></div>
+
             <div class="headlight right"></div>
 
-            <div class="turn-signal left" id="leftSignalLight"></div>
-            <div class="turn-signal right" id="rightSignalLight"></div>
-
-        </div>
-
-
-        <!-- CONTROLS -->
-
-        <div class="controls">
-
-            <button id="leftSignalBtn">
-                LEFT SIGNAL
-            </button>
-
-            <button id="rightSignalBtn">
-                RIGHT SIGNAL
-            </button>
-
-            <button id="leftShoulderBtn">
-                CHECK LEFT
-            </button>
-
-            <button id="rightShoulderBtn">
-                CHECK RIGHT
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- ==================================================
-         S.M.O.G. INDICATORS
-    ================================================== -->
-
-    <div class="smog-panel">
-
-        <div class="smog-title">
-            S.M.O.G.
-        </div>
-
-        <div class="smog-steps">
-
-            <div class="smog-step" id="stepSignal">
-
-                <span class="step-letter">S</span>
-
-                <span class="step-name">
-                    SIGNAL
-                </span>
-
-                <span class="step-status">
-                    READY
-                </span>
-
+            <div
+                class="turn-signal left"
+                id="leftSignalLight">
             </div>
 
-
-            <div class="smog-step" id="stepMirrors">
-
-                <span class="step-letter">M</span>
-
-                <span class="step-name">
-                    MIRRORS
-                </span>
-
-                <span class="step-status">
-                    READY
-                </span>
-
-            </div>
-
-
-            <div class="smog-step" id="stepShoulder">
-
-                <span class="step-letter">O</span>
-
-                <span class="step-name">
-                    OVER SHOULDER
-                </span>
-
-                <span class="step-status">
-                    READY
-                </span>
-
-            </div>
-
-
-            <div class="smog-step" id="stepGo">
-
-                <span class="step-letter">G</span>
-
-                <span class="step-name">
-                    GO
-                </span>
-
-                <span class="step-status">
-                    READY
-                </span>
-
+            <div
+                class="turn-signal right"
+                id="rightSignalLight">
             </div>
 
         </div>
 
-    </div>
+
+        <!-- =================================================
+             INSTRUCTION
+        ================================================== -->
+
+        <div
+            class="instruction"
+            id="instruction">
+
+            Choose whether you want to
+            move/turn left or right.
+
+        </div>
 
 
-    <!-- ==================================================
-         INSTRUCTION
-    ================================================== -->
+        <!-- =================================================
+             DIRECTION BUTTONS
+        ================================================== -->
 
-    <div class="instruction" id="instruction">
-        Demonstration: Prepare to change lanes.
-        Use the controls above to explore the simulator.
+        <div
+            class="direction-controls"
+            id="directionControls">
+
+            <button
+                class="direction-button"
+                id="leftButton">
+
+                MOVE / TURN LEFT
+
+            </button>
+
+
+            <button
+                class="direction-button"
+                id="rightButton">
+
+                MOVE / TURN RIGHT
+
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             S.M.O.G. INDICATORS
+        ================================================== -->
+
+        <div class="smog-panel">
+
+            <div class="smog-title">
+                S.M.O.G.
+            </div>
+
+
+            <div class="smog-steps">
+
+
+                <!-- SIGNAL -->
+
+                <div
+                    class="smog-step"
+                    id="stepSignal">
+
+                    <span class="step-letter">
+                        S
+                    </span>
+
+                    <span class="step-name">
+                        SIGNAL
+                    </span>
+
+                    <span
+                        class="step-status"
+                        id="signalStatus">
+
+                        READY
+
+                    </span>
+
+                </div>
+
+
+                <!-- MIRRORS -->
+
+                <div
+                    class="smog-step"
+                    id="stepMirrors">
+
+                    <span class="step-letter">
+                        M
+                    </span>
+
+                    <span class="step-name">
+                        MIRRORS
+                    </span>
+
+                    <span
+                        class="step-status"
+                        id="mirrorStatus">
+
+                        READY
+
+                    </span>
+
+                </div>
+
+
+                <!-- OVER SHOULDER -->
+
+                <div
+                    class="smog-step"
+                    id="stepShoulder">
+
+                    <span class="step-letter">
+                        O
+                    </span>
+
+                    <span class="step-name">
+                        OVER SHOULDER
+                    </span>
+
+                    <span
+                        class="step-status"
+                        id="shoulderStatus">
+
+                        READY
+
+                    </span>
+
+                </div>
+
+
+                <!-- GO -->
+
+                <div
+                    class="smog-step"
+                    id="stepGo">
+
+                    <span class="step-letter">
+                        G
+                    </span>
+
+                    <span class="step-name">
+                        GO
+                    </span>
+
+                    <span
+                        class="step-status"
+                        id="goStatus">
+
+                        READY
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             SUCCESS
+        ================================================== -->
+
+        <div
+            class="success-message"
+            id="successMessage">
+
+            S.M.O.G. COMPLETE
+
+        </div>
+
+
     </div>
 
 </div>
@@ -674,193 +1261,691 @@
 
 <script>
 
-    /* ==================================================
-       S.M.O.G. STATE
-    ================================================== */
-
-    let signalActive = null;
-
-    let leftShoulderChecked = false;
-    let rightShoulderChecked = false;
+/* =========================================================
+   BUILD 1.1
+   S.M.O.G. DRIVING SIMULATOR
+========================================================= */
 
 
-    /* ==================================================
-       ELEMENTS
-    ================================================== */
+/* =========================================================
+   CURRENT ROAD POSITION
+=========================================================
 
-    const leftSignalBtn =
-        document.getElementById("leftSignalBtn");
+   0 = leftmost lane in student's direction
+   1 = right lane in student's direction
 
-    const rightSignalBtn =
-        document.getElementById("rightSignalBtn");
+   The student begins in lane 1.
 
-    const leftSignalLight =
-        document.getElementById("leftSignalLight");
+   Left/right movement is determined from this position.
+========================================================= */
 
-    const rightSignalLight =
-        document.getElementById("rightSignalLight");
-
-    const leftShoulderBtn =
-        document.getElementById("leftShoulderBtn");
-
-    const rightShoulderBtn =
-        document.getElementById("rightShoulderBtn");
-
-    const stepSignal =
-        document.getElementById("stepSignal");
-
-    const stepMirrors =
-        document.getElementById("stepMirrors");
-
-    const stepShoulder =
-        document.getElementById("stepShoulder");
-
-    const stepGo =
-        document.getElementById("stepGo");
-
-    const instruction =
-        document.getElementById("instruction");
+let currentLane = 1;
 
 
-    /* ==================================================
-       TURN SIGNALS
-    ================================================== */
+/* =========================================================
+   CURRENT EXERCISE
+========================================================= */
 
-    leftSignalBtn.addEventListener("click", function () {
+let selectedDirection = null;
 
-        if (signalActive === "left") {
+let exerciseRunning = false;
 
-            signalActive = null;
 
-            leftSignalLight.classList.remove("active");
-            leftSignalBtn.classList.remove("active");
+/* =========================================================
+   DOM ELEMENTS
+========================================================= */
 
-        } else {
+const leftButton =
+    document.getElementById("leftButton");
 
-            signalActive = "left";
+const rightButton =
+    document.getElementById("rightButton");
 
-            leftSignalLight.classList.add("active");
-            rightSignalLight.classList.remove("active");
+const directionControls =
+    document.getElementById("directionControls");
 
-            leftSignalBtn.classList.add("active");
-            rightSignalBtn.classList.remove("active");
+const instruction =
+    document.getElementById("instruction");
 
-            completeStep(stepSignal);
+const car =
+    document.getElementById("car");
 
-            instruction.textContent =
-                "Left signal activated.";
+const leftSignalLight =
+    document.getElementById("leftSignalLight");
 
+const rightSignalLight =
+    document.getElementById("rightSignalLight");
+
+const leftMirror =
+    document.getElementById("leftMirror");
+
+const rightMirror =
+    document.getElementById("rightMirror");
+
+const rearMirror =
+    document.getElementById("rearMirror");
+
+const leftBlindspot =
+    document.getElementById("leftBlindspot");
+
+const rightBlindspot =
+    document.getElementById("rightBlindspot");
+
+const stepSignal =
+    document.getElementById("stepSignal");
+
+const stepMirrors =
+    document.getElementById("stepMirrors");
+
+const stepShoulder =
+    document.getElementById("stepShoulder");
+
+const stepGo =
+    document.getElementById("stepGo");
+
+const signalStatus =
+    document.getElementById("signalStatus");
+
+const mirrorStatus =
+    document.getElementById("mirrorStatus");
+
+const shoulderStatus =
+    document.getElementById("shoulderStatus");
+
+const goStatus =
+    document.getElementById("goStatus");
+
+const successMessage =
+    document.getElementById("successMessage");
+
+
+/* =========================================================
+   INITIAL ROAD POSITION
+========================================================= */
+
+updateDirectionButtons();
+
+
+/* =========================================================
+   BUTTON EVENTS
+========================================================= */
+
+leftButton.addEventListener(
+    "click",
+    function () {
+
+        if (exerciseRunning) {
+            return;
         }
 
-    });
-
-
-    rightSignalBtn.addEventListener("click", function () {
-
-        if (signalActive === "right") {
-
-            signalActive = null;
-
-            rightSignalLight.classList.remove("active");
-            rightSignalBtn.classList.remove("active");
-
-        } else {
-
-            signalActive = "right";
-
-            rightSignalLight.classList.add("active");
-            leftSignalLight.classList.remove("active");
-
-            rightSignalBtn.classList.add("active");
-            leftSignalBtn.classList.remove("active");
-
-            completeStep(stepSignal);
-
-            instruction.textContent =
-                "Right signal activated.";
-
+        if (!canMoveLeft()) {
+            return;
         }
 
-    });
+        startExercise("left");
+
+    }
+);
 
 
-    /* ==================================================
-       SHOULDER CHECKS
-    ================================================== */
+rightButton.addEventListener(
+    "click",
+    function () {
 
-    leftShoulderBtn.addEventListener("click", function () {
+        if (exerciseRunning) {
+            return;
+        }
 
-        leftShoulderChecked = true;
+        if (!canMoveRight()) {
+            return;
+        }
 
-        completeStep(stepShoulder);
+        startExercise("right");
 
-        instruction.textContent =
-            "Left shoulder check completed.";
-
-    });
-
-
-    rightShoulderBtn.addEventListener("click", function () {
-
-        rightShoulderChecked = true;
-
-        completeStep(stepShoulder);
-
-        instruction.textContent =
-            "Right shoulder check completed.";
-
-    });
+    }
+);
 
 
-    /* ==================================================
-       MIRROR DEMONSTRATION
-    ==================================================
+/* =========================================================
+   DETERMINE WHETHER MOVEMENT IS LEGAL
+========================================================= */
 
-       Build 1 treats the mirror step as a demonstration
-       element. Actual mirror interaction will be added
-       in a later build.
-    ================================================== */
+function canMoveLeft() {
 
-    document.querySelectorAll(".mirror").forEach(function (mirror) {
+    /*
+       Lane 0 is the leftmost lane in our direction.
 
-        mirror.addEventListener("click", function () {
+       Moving left from lane 0 would put the vehicle
+       into opposing traffic.
 
-            completeStep(stepMirrors);
+       Therefore:
 
-            instruction.textContent =
-                "Mirror checked.";
+       lane 0 = cannot move left
+       lane 1 = can move left
+    */
 
-        });
+    return currentLane > 0;
 
-    });
+}
 
 
-    /* ==================================================
-       COMPLETE S.M.O.G. STEP
-    ================================================== */
+function canMoveRight() {
 
-    function completeStep(element) {
+    /*
+       Lane 1 is the rightmost lane in our direction.
 
-        element.classList.add("complete");
+       Moving right from lane 1 would leave the roadway.
 
-        const status =
-            element.querySelector(".step-status");
+       Therefore:
 
-        status.textContent = "✓ COMPLETE";
+       lane 1 = cannot move right
+       lane 0 = can move right
+    */
+
+    return currentLane < 1;
+
+}
+
+
+/* =========================================================
+   UPDATE BUTTON AVAILABILITY
+========================================================= */
+
+function updateDirectionButtons() {
+
+    leftButton.disabled =
+        !canMoveLeft();
+
+    rightButton.disabled =
+        !canMoveRight();
+
+}
+
+
+/* =========================================================
+   START S.M.O.G. EXERCISE
+========================================================= */
+
+function startExercise(direction) {
+
+    exerciseRunning = true;
+
+    selectedDirection = direction;
+
+    resetVisualState();
+
+    directionControls.classList.add("hidden");
+
+    instruction.textContent =
+        direction === "left"
+            ? "Prepare to move left."
+            : "Prepare to move right.";
+
+
+    /*
+       STEP 1
+       SIGNAL
+    */
+
+    setTimeout(
+        runSignalStep,
+        700
+    );
+
+}
+
+
+/* =========================================================
+   STEP 1 — SIGNAL
+========================================================= */
+
+function runSignalStep() {
+
+    setCurrentStep(stepSignal);
+
+    instruction.textContent =
+        selectedDirection === "left"
+            ? "SIGNAL — Left signal activated."
+            : "SIGNAL — Right signal activated.";
+
+
+    if (selectedDirection === "left") {
+
+        leftSignalLight.classList.add("active");
+
+    } else {
+
+        rightSignalLight.classList.add("active");
 
     }
 
 
-    /* ==================================================
-       INITIAL STATE
-    ================================================== */
+    signalStatus.textContent =
+        "✓ COMPLETE";
 
-    console.log(
-        "S.M.O.G. Driving Simulator — Build 1 loaded."
+
+    stepSignal.classList.add("complete");
+
+
+    /*
+       STEP 2 begins after a short pause.
+    */
+
+    setTimeout(
+        runMirrorStep,
+        1400
     );
+
+}
+
+
+/* =========================================================
+   STEP 2 — MIRRORS
+========================================================= */
+
+function runMirrorStep() {
+
+    setCurrentStep(stepMirrors);
+
+    instruction.textContent =
+        selectedDirection === "left"
+            ? "CHECK REARVIEW AND LEFT MIRROR."
+            : "CHECK REARVIEW AND RIGHT MIRROR.";
+
+
+    /*
+       Rearview mirror is always checked.
+    */
+
+    rearMirror.classList.add("highlight");
+
+
+    /*
+       Highlight mirror on selected side.
+    */
+
+    if (selectedDirection === "left") {
+
+        leftMirror.classList.add("highlight");
+
+    } else {
+
+        rightMirror.classList.add("highlight");
+
+    }
+
+
+    /*
+       Complete mirror step.
+    */
+
+    mirrorStatus.textContent =
+        "✓ COMPLETE";
+
+    stepMirrors.classList.add("complete");
+
+
+    /*
+       STEP 3
+    */
+
+    setTimeout(
+        runShoulderStep,
+        1800
+    );
+
+}
+
+
+/* =========================================================
+   STEP 3 — OVER SHOULDER
+========================================================= */
+
+function runShoulderStep() {
+
+    setCurrentStep(stepShoulder);
+
+
+    /*
+       Remove mirror emphasis.
+    */
+
+    rearMirror.classList.remove("highlight");
+
+    leftMirror.classList.remove("highlight");
+
+    rightMirror.classList.remove("highlight");
+
+
+    /*
+       Highlight appropriate blind spot.
+    */
+
+    if (selectedDirection === "left") {
+
+        leftBlindspot.classList.add("highlight");
+
+        instruction.textContent =
+            "LOOK OVER YOUR LEFT SHOULDER.";
+
+        car.classList.add("shoulder-left");
+
+    } else {
+
+        rightBlindspot.classList.add("highlight");
+
+        instruction.textContent =
+            "LOOK OVER YOUR RIGHT SHOULDER.";
+
+        car.classList.add("shoulder-right");
+
+    }
+
+
+    shoulderStatus.textContent =
+        "✓ COMPLETE";
+
+    stepShoulder.classList.add("complete");
+
+
+    /*
+       STEP 4
+    */
+
+    setTimeout(
+        runGoStep,
+        1800
+    );
+
+}
+
+
+/* =========================================================
+   STEP 4 — GO
+========================================================= */
+
+function runGoStep() {
+
+    setCurrentStep(stepGo);
+
+
+    /*
+       Remove shoulder-check visual.
+    */
+
+    leftBlindspot.classList.remove("highlight");
+
+    rightBlindspot.classList.remove("highlight");
+
+    car.classList.remove("shoulder-left");
+
+    car.classList.remove("shoulder-right");
+
+
+    instruction.textContent =
+        "GO — Moving into the selected lane.";
+
+
+    goStatus.textContent =
+        "✓ COMPLETE";
+
+    stepGo.classList.add("complete");
+
+
+    /*
+       Move vehicle.
+    */
+
+    moveVehicle();
+
+
+    /*
+       Finish exercise.
+    */
+
+    setTimeout(
+        finishExercise,
+        1800
+    );
+
+}
+
+
+/* =========================================================
+   MOVE VEHICLE
+========================================================= */
+
+function moveVehicle() {
+
+    /*
+       The car starts in the center of the visible
+       driving lane.
+
+       We shift its horizontal position to represent
+       the lane change.
+
+       The road is perspective-based, so this is a
+       visual demonstration rather than full vehicle
+       physics at this stage.
+    */
+
+    if (selectedDirection === "left") {
+
+        car.style.left = "43%";
+
+        currentLane = 0;
+
+    }
+
+
+    if (selectedDirection === "right") {
+
+        car.style.left = "57%";
+
+        currentLane = 1;
+
+    }
+
+}
+
+
+/* =========================================================
+   FINISH EXERCISE
+========================================================= */
+
+function finishExercise() {
+
+    exerciseRunning = false;
+
+
+    /*
+       Turn signal off.
+    */
+
+    leftSignalLight.classList.remove("active");
+
+    rightSignalLight.classList.remove("active");
+
+
+    /*
+       Show success.
+    */
+
+    successMessage.classList.add("show");
+
+
+    instruction.textContent =
+        "S.M.O.G. complete. Lane change successful.";
+
+
+    /*
+       Update which direction is now available.
+    */
+
+    updateDirectionButtons();
+
+
+    /*
+       Return controls after short delay.
+    */
+
+    setTimeout(
+        function () {
+
+            successMessage.classList.remove("show");
+
+            directionControls.classList.remove("hidden");
+
+        },
+        1800
+    );
+
+}
+
+
+/* =========================================================
+   SET CURRENT STEP
+========================================================= */
+
+function setCurrentStep(step) {
+
+    /*
+       Remove current highlight from all steps.
+    */
+
+    stepSignal.classList.remove("current");
+
+    stepMirrors.classList.remove("current");
+
+    stepShoulder.classList.remove("current");
+
+    stepGo.classList.remove("current");
+
+
+    /*
+       Highlight current step.
+    */
+
+    step.classList.add("current");
+
+}
+
+
+/* =========================================================
+   RESET VISUAL STATE
+========================================================= */
+
+function resetVisualState() {
+
+    /*
+       Reset S.M.O.G. steps.
+    */
+
+    stepSignal.classList.remove(
+        "complete",
+        "current"
+    );
+
+    stepMirrors.classList.remove(
+        "complete",
+        "current"
+    );
+
+    stepShoulder.classList.remove(
+        "complete",
+        "current"
+    );
+
+    stepGo.classList.remove(
+        "complete",
+        "current"
+    );
+
+
+    /*
+       Reset status text.
+    */
+
+    signalStatus.textContent =
+        "READY";
+
+    mirrorStatus.textContent =
+        "READY";
+
+    shoulderStatus.textContent =
+        "READY";
+
+    goStatus.textContent =
+        "READY";
+
+
+    /*
+       Reset mirrors.
+    */
+
+    leftMirror.classList.remove(
+        "highlight"
+    );
+
+    rightMirror.classList.remove(
+        "highlight"
+    );
+
+    rearMirror.classList.remove(
+        "highlight"
+    );
+
+
+    /*
+       Reset blind spots.
+    */
+
+    leftBlindspot.classList.remove(
+        "highlight"
+    );
+
+    rightBlindspot.classList.remove(
+        "highlight"
+    );
+
+
+    /*
+       Reset shoulder animation.
+    */
+
+    car.classList.remove(
+        "shoulder-left"
+    );
+
+    car.classList.remove(
+        "shoulder-right"
+    );
+
+
+    /*
+       Reset signals.
+    */
+
+    leftSignalLight.classList.remove(
+        "active"
+    );
+
+    rightSignalLight.classList.remove(
+        "active"
+    );
+
+}
+
+
+/* =========================================================
+   END OF BUILD 1.1
+========================================================= */
+
+console.log(
+    "S.M.O.G. Driving Simulator — Build 1.1 loaded."
+);
 
 </script>
 
 </body>
 </html>
-```
