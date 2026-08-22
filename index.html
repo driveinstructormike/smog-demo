@@ -594,7 +594,7 @@ body {
 
     border-radius: 50%;
 
-    z-index: -1;
+    z-index: 10;
 
     pointer-events: none;
 
@@ -1351,7 +1351,7 @@ body {
 <div class="smog-panel">
 
     <div class="smog-title">
-        S.M.O.G. Steps
+        S.M.O.G. 
     </div>
 
 
@@ -1480,26 +1480,18 @@ body {
 ========================================================= */
 
 
-/*
-   ROAD POSITION
-
-   0 = Lane 1
-   1 = Lane 2
-   2 = Center Turn Lane
-   3 = Lane 4
-   4 = Lane 5
-
-   The vehicle starts in Lane 2.
-
-   Therefore:
-
-   currentLane = 1
-*/
+/* =========================================================
+   STATE
+========================================================= */
 
 let currentLane = 1;
+// 0 = Lane 1
+// 1 = Lane 2
+// 2 = Center Turn Lane
+// 3 = Lane 4
+// 4 = Lane 5
 
 let selectedDirection = null;
-
 let exerciseRunning = false;
 
 
@@ -1508,136 +1500,89 @@ let exerciseRunning = false;
 ========================================================= */
 
 const leftButton =
-    document.getElementById(
-        "leftButton"
-    );
+    document.getElementById("leftButton");
 
 const rightButton =
-    document.getElementById(
-        "rightButton"
-    );
+    document.getElementById("rightButton");
 
 const directionControls =
-    document.getElementById(
-        "directionControls"
-    );
+    document.getElementById("directionControls");
 
 const instruction =
-    document.getElementById(
-        "instruction"
-    );
+    document.getElementById("instruction");
 
 const car =
-    document.getElementById(
-        "car"
-    );
+    document.getElementById("car");
 
 const leftSignalLight =
-    document.getElementById(
-        "leftSignalLight"
-    );
+    document.getElementById("leftSignalLight");
 
 const rightSignalLight =
-    document.getElementById(
-        "rightSignalLight"
-    );
+    document.getElementById("rightSignalLight");
 
 const leftMirror =
-    document.getElementById(
-        "leftMirror"
-    );
+    document.getElementById("leftMirror");
 
 const rightMirror =
-    document.getElementById(
-        "rightMirror"
-    );
+    document.getElementById("rightMirror");
 
 const rearMirror =
-    document.getElementById(
-        "rearMirror"
-    );
+    document.getElementById("rearMirror");
 
 const leftBlindspot =
-    document.getElementById(
-        "leftBlindspot"
-    );
+    document.getElementById("leftBlindspot");
 
 const rightBlindspot =
-    document.getElementById(
-        "rightBlindspot"
-    );
+    document.getElementById("rightBlindspot");
 
 const stepSignal =
-    document.getElementById(
-        "stepSignal"
-    );
+    document.getElementById("stepSignal");
 
 const stepMirrors =
-    document.getElementById(
-        "stepMirrors"
-    );
+    document.getElementById("stepMirrors");
 
 const stepShoulder =
-    document.getElementById(
-        "stepShoulder"
-    );
+    document.getElementById("stepShoulder");
 
 const stepGo =
-    document.getElementById(
-        "stepGo"
-    );
+    document.getElementById("stepGo");
 
 const signalStatus =
-    document.getElementById(
-        "signalStatus"
-    );
+    document.getElementById("signalStatus");
 
 const mirrorStatus =
-    document.getElementById(
-        "mirrorStatus"
-    );
+    document.getElementById("mirrorStatus");
 
 const shoulderStatus =
-    document.getElementById(
-        "shoulderStatus"
-    );
+    document.getElementById("shoulderStatus");
 
 const goStatus =
-    document.getElementById(
-        "goStatus"
-    );
+    document.getElementById("goStatus");
 
 const successMessage =
-    document.getElementById(
-        "successMessage"
-    );
+    document.getElementById("successMessage");
 
 
 /* =========================================================
-   LANE POSITION
+   LANE POSITIONS
 =========================================================
 
-   The five lanes are:
+   Roadway occupies 84% of the simulator:
 
-   Lane 5       10%
-   Lane 4       30%
-   Center       50%
-   Lane 2       70%
-   Lane 1       90%
+   Lane 5       16.4%
+   Lane 4       33.2%
+   Center       50.0%
+   Lane 2       66.8%
+   Lane 1       83.6%
 
-   Remember that CSS "left" increases toward the right.
 ========================================================= */
 
 const lanePositions = {
 
     0: 83.6,   // Lane 1
-
     1: 66.8,   // Lane 2
-
-    2: 50.0,   // Center turn lane
-
+    2: 50.0,   // Center Turn Lane
     3: 33.2,   // Lane 4
-
     4: 16.4    // Lane 5
 
 };
@@ -1699,21 +1644,11 @@ rightButton.addEventListener(
 function canMoveLeft() {
 
     /*
-       Lane positions:
+       Lane 1 → Lane 2
+       Lane 2 → Center Turn Lane
 
-       0 = Lane 1
-       1 = Lane 2
-       2 = Center Turn Lane
-
-       From Lane 1:
-           LEFT → Lane 2
-
-       From Lane 2:
-           LEFT → Center Turn Lane
-
-       From Center Turn Lane:
-           LEFT = NOT ALLOWED
-           (would enter opposing traffic)
+       Center Turn Lane → NOT ALLOWED
+       because that would enter opposing traffic.
     */
 
     return currentLane < 2;
@@ -1724,15 +1659,11 @@ function canMoveLeft() {
 function canMoveRight() {
 
     /*
-       From Lane 1:
-           RIGHT = NOT ALLOWED
-           (would leave roadway)
+       Lane 1 → NOT ALLOWED
+       because that would leave the roadway.
 
-       From Lane 2:
-           RIGHT → Lane 1
-
-       From Center Turn Lane:
-           RIGHT → Lane 2
+       Lane 2 → Lane 1
+       Center Turn → Lane 2
     */
 
     return currentLane > 0 && currentLane <= 2;
@@ -1781,10 +1712,47 @@ function startExercise(direction) {
 
     setTimeout(
         runSignalStep,
-        700
+        500
     );
 
 }
+
+
+/* =========================================================
+   STEP 1 — SIGNAL
+========================================================= */
+
+function runSignalStep() {
+
+    setCurrentStep(
+        stepSignal
+    );
+
+
+    instruction.textContent =
+        selectedDirection === "left"
+            ? "SIGNAL — Left signal activated."
+            : "SIGNAL — Right signal activated.";
+
+
+    startTurnSignal();
+
+
+    signalStatus.textContent =
+        "✓ COMPLETE";
+
+    stepSignal.classList.add(
+        "complete"
+    );
+
+
+    setTimeout(
+        runMirrorStep,
+        1500
+    );
+
+}
+
 
 /* =========================================================
    FLASH TURN SIGNAL
@@ -1803,71 +1771,32 @@ function startTurnSignal() {
     const maxFlashes = 6;
 
 
-    const flashTimer = setInterval(
-        function () {
+    const flashTimer =
+        setInterval(
+            function () {
 
-            signal.classList.toggle(
-                "active"
-            );
-
-            flashCount++;
-
-
-            if (flashCount >= maxFlashes) {
-
-                clearInterval(
-                    flashTimer
-                );
-
-                /*
-                   Make sure the signal is
-                   off before moving to mirrors.
-                */
-
-                signal.classList.remove(
+                signal.classList.toggle(
                     "active"
                 );
 
-            }
-
-        },
-        220
-    );
-
-}
-   
-/* =========================================================
-   STEP 1 — SIGNAL
-========================================================= */
-
-function runSignalStep() {
-
-    setCurrentStep(
-        stepSignal
-    );
+                flashCount++;
 
 
-    instruction.textContent =
-        selectedDirection === "left"
-            ? "SIGNAL — Left signal activated."
-            : "SIGNAL — Right signal activated.";
+                if (flashCount >= maxFlashes) {
 
+                    clearInterval(
+                        flashTimer
+                    );
 
-startTurnSignal();
+                    signal.classList.remove(
+                        "active"
+                    );
 
+                }
 
-    signalStatus.textContent =
-        "✓ COMPLETE";
-
-    stepSignal.classList.add(
-        "complete"
-    );
-
-
-    setTimeout(
-        runMirrorStep,
-        1400
-    );
+            },
+            220
+        );
 
 }
 
@@ -1889,18 +1818,10 @@ function runMirrorStep() {
             : "CHECK REARVIEW AND RIGHT MIRROR.";
 
 
-    /*
-       Rearview mirror always highlights.
-    */
-
     rearMirror.classList.add(
         "highlight"
     );
 
-
-    /*
-       Highlight selected side mirror.
-    */
 
     if (selectedDirection === "left") {
 
@@ -1963,38 +1884,42 @@ function runShoulderStep() {
 
 
     /*
-       Show blind spot behind the vehicle
-       on the selected side.
+       Show the blind spot on the
+       selected side.
+
+       The blind spot is now physically
+       inside the car element, so it
+       automatically follows the vehicle.
     */
 
     if (selectedDirection === "left") {
 
-    leftBlindspot.classList.add(
-        "highlight"
-    );
+        leftBlindspot.classList.add(
+            "highlight"
+        );
 
-    car.classList.add(
-        "shoulder-left"
-    );
+        car.classList.add(
+            "shoulder-left"
+        );
 
-    instruction.textContent =
-        "LOOK OVER YOUR LEFT SHOULDER.";
+        instruction.textContent =
+            "LOOK OVER YOUR LEFT SHOULDER.";
 
-}
-else {
+    }
+    else {
 
-    rightBlindspot.classList.add(
-        "highlight"
-    );
+        rightBlindspot.classList.add(
+            "highlight"
+        );
 
-    car.classList.add(
-        "shoulder-right"
-    );
+        car.classList.add(
+            "shoulder-right"
+        );
 
-    instruction.textContent =
-        "LOOK OVER YOUR RIGHT SHOULDER.";
+        instruction.textContent =
+            "LOOK OVER YOUR RIGHT SHOULDER.";
 
-}
+    }
 
 
     shoulderStatus.textContent =
@@ -2025,7 +1950,7 @@ function runGoStep() {
 
 
     /*
-       Remove blind spot.
+       Hide blind spots.
     */
 
     leftBlindspot.classList.remove(
@@ -2075,31 +2000,16 @@ function runGoStep() {
 
 function moveVehicle() {
 
-    /*
-       LEFT:
-
-       Lane 2 → Center Turn Lane
-
-       RIGHT:
-
-       Lane 2 → Lane 1
-
-       The car moves completely to the
-       destination lane.
-    */
-
     if (selectedDirection === "left") {
 
-        currentLane =
-            currentLane + 1;
+        currentLane++;
 
     }
 
 
     if (selectedDirection === "right") {
 
-        currentLane =
-            currentLane - 1;
+        currentLane--;
 
     }
 
@@ -2118,17 +2028,7 @@ function setCarToLane() {
     car.style.left =
         lanePositions[currentLane] + "%";
 
-    /*
-       Wait one frame so the browser has
-       updated the car's actual position.
-    */
-
-    requestAnimationFrame(
-        positionBlindSpots
-    );
-
 }
-
 
 
 /* =========================================================
@@ -2219,10 +2119,6 @@ function setCurrentStep(step) {
 
 function resetVisualState() {
 
-    /*
-       S.M.O.G. steps
-    */
-
     stepSignal.classList.remove(
         "complete",
         "current"
@@ -2244,10 +2140,6 @@ function resetVisualState() {
     );
 
 
-    /*
-       Status
-    */
-
     signalStatus.textContent =
         "READY";
 
@@ -2260,10 +2152,6 @@ function resetVisualState() {
     goStatus.textContent =
         "READY";
 
-
-    /*
-       Mirrors
-    */
 
     leftMirror.classList.remove(
         "highlight"
@@ -2278,10 +2166,6 @@ function resetVisualState() {
     );
 
 
-    /*
-       Blind spots
-    */
-
     leftBlindspot.classList.remove(
         "highlight"
     );
@@ -2291,10 +2175,6 @@ function resetVisualState() {
     );
 
 
-    /*
-       Shoulder position
-    */
-
     car.classList.remove(
         "shoulder-left"
     );
@@ -2303,10 +2183,6 @@ function resetVisualState() {
         "shoulder-right"
     );
 
-
-    /*
-       Signals
-    */
 
     leftSignalLight.classList.remove(
         "active"
@@ -2320,7 +2196,7 @@ function resetVisualState() {
 
 
 /* =========================================================
-   BUILD 1.2 LOADED
+   BUILD 1.2
 ========================================================= */
 
 console.log(
