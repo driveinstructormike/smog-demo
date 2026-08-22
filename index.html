@@ -1124,7 +1124,7 @@ body {
         </div>
 
         <div class="direction-arrow">
-            ←
+            ↓
         </div>
 
     </div>
@@ -1139,7 +1139,7 @@ body {
         </div>
 
         <div class="direction-arrow">
-            ←
+            ↓
         </div>
 
     </div>
@@ -1165,7 +1165,7 @@ body {
         </div>
 
         <div class="direction-arrow">
-            →
+            ↑
         </div>
 
     </div>
@@ -1180,7 +1180,7 @@ body {
         </div>
 
         <div class="direction-arrow">
-            →
+            ↑
         </div>
 
     </div>
@@ -1685,33 +1685,24 @@ rightButton.addEventListener(
 function canMoveLeft() {
 
     /*
-       From Lane 2:
+       Lane positions:
 
-       LEFT = Center Turn Lane
-
-       From Center Turn Lane:
-
-       LEFT would enter opposing traffic,
-       so it is disabled.
+       0 = Lane 1
+       1 = Lane 2
+       2 = Center Turn Lane
 
        From Lane 1:
+           LEFT → Lane 2
 
-       LEFT = Lane 2.
+       From Lane 2:
+           LEFT → Center Turn Lane
+
+       From Center Turn Lane:
+           LEFT = NOT ALLOWED
+           (would enter opposing traffic)
     */
 
-    if (currentLane === 2) {
-        return false;
-    }
-
-    if (currentLane === 3) {
-        return false;
-    }
-
-    if (currentLane === 4) {
-        return false;
-    }
-
-    return currentLane > 0;
+    return currentLane < 2;
 
 }
 
@@ -1719,19 +1710,18 @@ function canMoveLeft() {
 function canMoveRight() {
 
     /*
-       From Lane 2:
+       From Lane 1:
+           RIGHT = NOT ALLOWED
+           (would leave roadway)
 
-       RIGHT = Lane 1.
+       From Lane 2:
+           RIGHT → Lane 1
 
        From Center Turn Lane:
-
-       RIGHT = Lane 2.
-
-       The center turn lane can therefore
-       return to the travel lane.
+           RIGHT → Lane 2
     */
 
-    return currentLane < 2;
+    return currentLane > 0 && currentLane <= 2;
 
 }
 
@@ -1782,7 +1772,56 @@ function startExercise(direction) {
 
 }
 
+/* =========================================================
+   FLASH TURN SIGNAL
+========================================================= */
 
+function startTurnSignal() {
+
+    const signal =
+        selectedDirection === "left"
+            ? leftSignalLight
+            : rightSignalLight;
+
+
+    let flashCount = 0;
+
+    const maxFlashes = 6;
+
+
+    const flashTimer = setInterval(
+        function () {
+
+            signal.classList.toggle(
+                "active"
+            );
+
+            flashCount++;
+
+
+            if (flashCount >= maxFlashes) {
+
+                clearInterval(
+                    flashTimer
+                );
+
+                /*
+                   Make sure the signal is
+                   off before moving to mirrors.
+                */
+
+                signal.classList.remove(
+                    "active"
+                );
+
+            }
+
+        },
+        220
+    );
+
+}
+   
 /* =========================================================
    STEP 1 — SIGNAL
 ========================================================= */
@@ -1800,20 +1839,7 @@ function runSignalStep() {
             : "SIGNAL — Right signal activated.";
 
 
-    if (selectedDirection === "left") {
-
-        leftSignalLight.classList.add(
-            "active"
-        );
-
-    }
-    else {
-
-        rightSignalLight.classList.add(
-            "active"
-        );
-
-    }
+startTurnSignal();
 
 
     signalStatus.textContent =
