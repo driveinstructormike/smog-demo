@@ -583,13 +583,12 @@ body {
 */
 
 .blindspot {
-
     position: absolute;
 
-    width: 13%;
-    height: 17%;
+    width: 10%;
+    height: 13%;
 
-    top: 69%;
+    top: 76%;
 
     background: rgba(255,193,7,0);
 
@@ -610,19 +609,17 @@ body {
 }
 
 
-/* Left side/rear blind spot */
-
-.blindspot.left {
-
-    left: 57%;
-}
-
-
-/* Right side/rear blind spot */
-
+.blindspot.left,
 .blindspot.right {
 
-    left: 77%;
+    /*
+       JavaScript will position the marker
+       dynamically based on the car's
+       current lane.
+    */
+
+    left: 0;
+
 }
 
 
@@ -1955,32 +1952,32 @@ function runShoulderStep() {
 
     if (selectedDirection === "left") {
 
-        leftBlindspot.classList.add(
-            "highlight"
-        );
+    leftBlindspot.classList.add(
+        "highlight"
+    );
 
-        car.classList.add(
-            "shoulder-left"
-        );
+    car.classList.add(
+        "shoulder-left"
+    );
 
-        instruction.textContent =
-            "LOOK OVER YOUR LEFT SHOULDER.";
+    instruction.textContent =
+        "LOOK OVER YOUR LEFT SHOULDER.";
 
-    }
-    else {
+}
+else {
 
-        rightBlindspot.classList.add(
-            "highlight"
-        );
+    rightBlindspot.classList.add(
+        "highlight"
+    );
 
-        car.classList.add(
-            "shoulder-right"
-        );
+    car.classList.add(
+        "shoulder-right"
+    );
 
-        instruction.textContent =
-            "LOOK OVER YOUR RIGHT SHOULDER.";
+    instruction.textContent =
+        "LOOK OVER YOUR RIGHT SHOULDER.";
 
-    }
+}
 
 
     shoulderStatus.textContent =
@@ -2103,6 +2100,51 @@ function setCarToLane() {
 
     car.style.left =
         lanePositions[currentLane];
+
+}
+
+/* =========================================================
+   POSITION BLIND SPOT
+========================================================= */
+
+function positionBlindSpots() {
+
+    /*
+       Convert the car's CSS left position
+       into a numerical percentage.
+    */
+
+    const carPosition =
+        parseFloat(
+            lanePositions[currentLane]
+        );
+
+
+    /*
+       The blind spot should sit beside
+       and slightly behind the car.
+
+       Because the car itself is approximately
+       11% wide, we offset the marker toward
+       the selected side.
+    */
+
+    const leftPosition =
+        carPosition - 8;
+
+    const rightPosition =
+        carPosition + 8;
+
+
+    /*
+       Position the markers.
+    */
+
+    leftBlindspot.style.left =
+        leftPosition + "%";
+
+    rightBlindspot.style.left =
+        rightPosition + "%";
 
 }
 
