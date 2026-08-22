@@ -609,18 +609,7 @@ body {
 }
 
 
-.blindspot.left,
-.blindspot.right {
 
-    /*
-       JavaScript will position the marker
-       dynamically based on the car's
-       current lane.
-    */
-
-    left: 0;
-
-}
 
 
 /* Highlight */
@@ -1613,15 +1602,15 @@ const successMessage =
 
 const lanePositions = {
 
-    0: "90%",   // Lane 1
+    0: 83.6,   // Lane 1
 
-    1: "70%",   // Lane 2
+    1: 66.8,   // Lane 2
 
-    2: "50%",   // Center turn lane
+    2: 50.0,   // Center turn lane
 
-    3: "30%",   // Lane 4
+    3: 33.2,   // Lane 4
 
-    4: "10%"    // Lane 5
+    4: 16.4    // Lane 5
 
 };
 
@@ -2099,55 +2088,71 @@ function moveVehicle() {
 function setCarToLane() {
 
     car.style.left =
-        lanePositions[currentLane];
+        lanePositions[currentLane] + "%";
+
+    /*
+       Wait one frame so the browser has
+       updated the car's actual position.
+    */
+
+    requestAnimationFrame(
+        positionBlindSpots
+    );
 
 }
 
 /* =========================================================
-   POSITION BLIND SPOT
+   POSITION BLIND SPOTS RELATIVE TO CAR
 ========================================================= */
 
 function positionBlindSpots() {
 
     /*
-       Convert the car's CSS left position
-       into a numerical percentage.
+       Get the actual center of the car
+       inside the simulator.
     */
 
-    const carPosition =
-        parseFloat(
-            lanePositions[currentLane]
-        );
+    const carCenter =
+        car.offsetLeft +
+        (car.offsetWidth / 2);
 
 
     /*
-       The blind spot should sit beside
-       and slightly behind the car.
+       Place the blind-spot markers behind
+       and beside the car.
 
-       Because the car itself is approximately
-       11% wide, we offset the marker toward
-       the selected side.
+       The offsets are based on the car's
+       actual width, not the screen.
     */
 
-    const leftPosition =
-        carPosition - 8;
-
-    const rightPosition =
-        carPosition + 8;
+    const sideOffset =
+        car.offsetWidth * 0.85;
 
 
     /*
-       Position the markers.
+       LEFT REAR BLIND SPOT
     */
 
     leftBlindspot.style.left =
-        leftPosition + "%";
+        (
+            carCenter -
+            sideOffset -
+            (leftBlindspot.offsetWidth / 2)
+        ) + "px";
+
+
+    /*
+       RIGHT REAR BLIND SPOT
+    */
 
     rightBlindspot.style.left =
-        rightPosition + "%";
+        (
+            carCenter +
+            sideOffset -
+            (rightBlindspot.offsetWidth / 2)
+        ) + "px";
 
 }
-
 
 /* =========================================================
    FINISH EXERCISE
