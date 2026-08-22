@@ -535,58 +535,82 @@ body {
 }
 
 
-/* Turn signals */
+/* =========================================================
+   REAR TURN SIGNALS
+========================================================= */
 
 .turn-signal {
 
     position: absolute;
 
-    width: 11%;
-    height: 7%;
+    width: 18%;
+    height: 8%;
 
-    top: 70%;
+    bottom: 4%;
+
+    background: #5b3b00;
 
     border-radius: 50%;
 
-    background: #555;
+    opacity: .45;
+
+    z-index: 20;
 
     transition:
-        background .2s ease,
-        box-shadow .2s ease;
+        opacity .15s ease,
+        box-shadow .15s ease;
 }
+
+
+/* LEFT REAR SIGNAL */
 
 .turn-signal.left {
+
     left: 8%;
+
 }
 
+
+/* RIGHT REAR SIGNAL */
+
 .turn-signal.right {
+
     right: 8%;
+
 }
+
+
+/* ACTIVE FLASHING SIGNAL */
 
 .turn-signal.active {
 
     background: #ffb300;
 
+    opacity: 1;
+
     box-shadow:
-        0 0 15px #ffb300;
+        0 0 10px #ffb300,
+        0 0 20px #ffb300,
+        0 0 30px rgba(255,179,0,.7);
+
 }
 
 
 /* =========================================================
-   BLIND SPOT
-   Positioned relative to the CAR
+   REAR BLIND SPOTS
 ========================================================= */
 
 .blindspot {
 
     position: absolute;
 
-    width: 95%;
-    height: 42%;
+    width: 65%;
+    height: 32%;
 
-    top: 48%;
+    bottom: -4%;
 
-    background: rgba(255,193,7,0);
+    background:
+        rgba(255,193,7,0);
 
     border:
         3px solid transparent;
@@ -600,84 +624,48 @@ body {
     opacity: 0;
 
     transition:
-        background .35s ease,
-        border-color .35s ease,
-        box-shadow .35s ease,
-        opacity .35s ease;
+        background .3s ease,
+        border-color .3s ease,
+        box-shadow .3s ease,
+        opacity .3s ease;
 
 }
 
 
-/*
-   LEFT REAR
-
-   The marker sits behind and to the
-   left of the vehicle.
-*/
+/* LEFT REAR BLIND SPOT */
 
 .blindspot.left {
 
-    left: -72%;
+    left: -52%;
 
 }
 
 
-/*
-   RIGHT REAR
-
-   The marker sits behind and to the
-   right of the vehicle.
-*/
+/* RIGHT REAR BLIND SPOT */
 
 .blindspot.right {
 
-    left: 77%;
+    right: -52%;
 
 }
 
 
-/*
-   Highlighted blind spot
-*/
+/* =========================================================
+   ACTIVE BLIND SPOT
+========================================================= */
 
 .blindspot.highlight {
 
     background:
-        rgba(255,193,7,.32);
+        rgba(255,193,7,.30);
 
     border-color:
         #ffd54a;
 
     box-shadow:
-        0 0 25px rgba(255,213,74,.9);
+        0 0 18px rgba(255,213,74,.85);
 
     opacity: 1;
-
-}
-
-
-.blindspot-label {
-
-    position: absolute;
-
-    left: 0;
-    right: 0;
-
-    top: 50%;
-
-    transform:
-        translateY(-50%);
-
-    text-align: center;
-
-    font-size: 10px;
-
-    font-weight: bold;
-
-    color: #ffffff;
-
-    text-shadow:
-        0 2px 3px #000;
 
 }
 
