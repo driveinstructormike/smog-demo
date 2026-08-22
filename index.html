@@ -1510,6 +1510,12 @@ const leftSignalLight =
 const rightSignalLight =
     document.getElementById("rightSignalLight");
 
+const leftFrontSignalLight =
+    document.getElementById("leftFrontSignalLight");
+
+const rightFrontSignalLight =
+    document.getElementById("rightFrontSignalLight");
+
 const leftMirror =
     document.getElementById("leftMirror");
 
@@ -1750,10 +1756,18 @@ function runSignalStep() {
 
 function startTurnSignal() {
 
-    const signal =
+    const signals =
         selectedDirection === "left"
-            ? leftSignalLight
-            : rightSignalLight;
+
+            ? [
+                leftSignalLight,
+                leftFrontSignalLight
+              ]
+
+            : [
+                rightSignalLight,
+                rightFrontSignalLight
+              ];
 
 
     let flashCount = 0;
@@ -1765,9 +1779,21 @@ function startTurnSignal() {
         setInterval(
             function () {
 
-                signal.classList.toggle(
-                    "active"
+                /*
+                   Toggle ALL signals on the
+                   selected side simultaneously.
+                */
+
+                signals.forEach(
+                    function(signal) {
+
+                        signal.classList.toggle(
+                            "active"
+                        );
+
+                    }
                 );
+
 
                 flashCount++;
 
@@ -1778,8 +1804,20 @@ function startTurnSignal() {
                         flashTimer
                     );
 
-                    signal.classList.remove(
-                        "active"
+
+                    /*
+                       Make sure every signal
+                       is OFF when finished.
+                    */
+
+                    signals.forEach(
+                        function(signal) {
+
+                            signal.classList.remove(
+                                "active"
+                            );
+
+                        }
                     );
 
                 }
@@ -2041,6 +2079,14 @@ function finishExercise() {
     rightSignalLight.classList.remove(
         "active"
     );
+
+   leftFrontSignalLight.classList.remove(
+    "active"
+   );
+
+   rightFrontSignalLight.classList.remove(
+    "active"
+   );
 
 
     successMessage.classList.add(
