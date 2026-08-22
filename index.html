@@ -575,20 +575,17 @@ body {
 
 /* =========================================================
    BLIND SPOT
+   Positioned relative to the CAR
 ========================================================= */
 
-/*
-   The blind spot is deliberately positioned behind
-   and to the selected side of the vehicle.
-*/
-
 .blindspot {
+
     position: absolute;
 
-    width: 10%;
-    height: 13%;
+    width: 95%;
+    height: 42%;
 
-    top: 76%;
+    top: 48%;
 
     background: rgba(255,193,7,0);
 
@@ -597,22 +594,52 @@ body {
 
     border-radius: 50%;
 
-    z-index: 12;
+    z-index: -1;
 
     pointer-events: none;
+
+    opacity: 0;
 
     transition:
         background .35s ease,
         border-color .35s ease,
         box-shadow .35s ease,
         opacity .35s ease;
+
 }
 
 
+/*
+   LEFT REAR
+
+   The marker sits behind and to the
+   left of the vehicle.
+*/
+
+.blindspot.left {
+
+    left: -72%;
+
+}
 
 
+/*
+   RIGHT REAR
 
-/* Highlight */
+   The marker sits behind and to the
+   right of the vehicle.
+*/
+
+.blindspot.right {
+
+    left: 77%;
+
+}
+
+
+/*
+   Highlighted blind spot
+*/
 
 .blindspot.highlight {
 
@@ -624,6 +651,9 @@ body {
 
     box-shadow:
         0 0 25px rgba(255,213,74,.9);
+
+    opacity: 1;
+
 }
 
 
@@ -641,7 +671,7 @@ body {
 
     text-align: center;
 
-    font-size: 11px;
+    font-size: 10px;
 
     font-weight: bold;
 
@@ -650,13 +680,6 @@ body {
     text-shadow:
         0 2px 3px #000;
 
-    opacity: 0;
-}
-
-.blindspot.highlight
-.blindspot-label {
-
-    opacity: 1;
 }
 
 
@@ -1217,30 +1240,6 @@ body {
 </div>
 
 
-<!-- =====================================================
-     BLIND SPOTS
-====================================================== -->
-
-<div
-    class="blindspot left"
-    id="leftBlindspot">
-
-    <div class="blindspot-label">
-        BLIND SPOT
-    </div>
-
-</div>
-
-
-<div
-    class="blindspot right"
-    id="rightBlindspot">
-
-    <div class="blindspot-label">
-        BLIND SPOT
-    </div>
-
-</div>
 
 
 <!-- =====================================================
@@ -1250,6 +1249,35 @@ body {
 <div
     class="car"
     id="car">
+
+
+    <!-- LEFT REAR BLIND SPOT -->
+
+    <div
+        class="blindspot left"
+        id="leftBlindspot">
+
+        <div class="blindspot-label">
+            BLIND SPOT
+        </div>
+
+    </div>
+
+
+    <!-- RIGHT REAR BLIND SPOT -->
+
+    <div
+        class="blindspot right"
+        id="rightBlindspot">
+
+        <div class="blindspot-label">
+            BLIND SPOT
+        </div>
+
+    </div>
+
+
+    <!-- CAR BODY -->
 
     <div class="car-body"></div>
 
@@ -1323,7 +1351,7 @@ body {
 <div class="smog-panel">
 
     <div class="smog-title">
-        S.M.O.G.
+        S.M.O.G. Steps
     </div>
 
 
@@ -2101,58 +2129,7 @@ function setCarToLane() {
 
 }
 
-/* =========================================================
-   POSITION BLIND SPOTS RELATIVE TO CAR
-========================================================= */
 
-function positionBlindSpots() {
-
-    /*
-       Get the actual center of the car
-       inside the simulator.
-    */
-
-    const carCenter =
-        car.offsetLeft +
-        (car.offsetWidth / 2);
-
-
-    /*
-       Place the blind-spot markers behind
-       and beside the car.
-
-       The offsets are based on the car's
-       actual width, not the screen.
-    */
-
-    const sideOffset =
-        car.offsetWidth * 0.85;
-
-
-    /*
-       LEFT REAR BLIND SPOT
-    */
-
-    leftBlindspot.style.left =
-        (
-            carCenter -
-            sideOffset -
-            (leftBlindspot.offsetWidth / 2)
-        ) + "px";
-
-
-    /*
-       RIGHT REAR BLIND SPOT
-    */
-
-    rightBlindspot.style.left =
-        (
-            carCenter +
-            sideOffset -
-            (rightBlindspot.offsetWidth / 2)
-        ) + "px";
-
-}
 
 /* =========================================================
    FINISH EXERCISE
